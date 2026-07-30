@@ -29,6 +29,64 @@ export const Route = createFileRoute("/")({
         content:
           "12+ years architecting AI, banking, cloud, and event-streaming platforms for global enterprises.",
       },
+      { property: "og:type", content: "profile" },
+      { property: "og:url", content: "/" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Pratik Shukla — Enterprise Solution Architect" },
+      {
+        name: "twitter:description",
+        content:
+          "Pratik Shukla, Enterprise Solution Architect in Dubai, UAE — AI, cloud, banking and event-streaming platforms.",
+      },
+      { name: "robots", content: "index, follow, max-image-preview:large" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Person",
+              "@id": "/#pratik-shukla",
+              name: "Pratik Shukla",
+              alternateName: "Pratik Shukla Dubai",
+              jobTitle: "Enterprise Solution Architect",
+              description:
+                "Enterprise Solution Architect based in Dubai, UAE with 12+ years of experience across banking, AI, cloud, and event streaming.",
+              url: "/",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Dubai",
+                addressCountry: "AE",
+              },
+              knowsAbout: [
+                "Enterprise Architecture",
+                "Solution Architecture",
+                "Apache Kafka",
+                "Event Streaming",
+                "Cloud Architecture",
+                "Artificial Intelligence",
+                "Banking Technology",
+              ],
+              sameAs: [
+                "https://github.com/pratiks360",
+                "https://linkedin.com/in/pratikshukla360",
+                "https://medium.com/@pratiks360",
+              ],
+            },
+            {
+              "@type": "WebSite",
+              "@id": "/#website",
+              name: "Pratik Shukla — Enterprise Solution Architect",
+              url: "/",
+              about: { "@id": "/#pratik-shukla" },
+              inLanguage: "en",
+            },
+          ],
+        }),
+      },
     ],
   }),
   component: Index,
