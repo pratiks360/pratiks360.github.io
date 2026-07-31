@@ -61,5 +61,8 @@ src/
   components/portfolio/ Page sections — Hero, About, Experience, Contact, …
   components/ui/        shadcn/ui primitives
   lib/                  Shared helpers
-public/images/          Carousel images — see public/images/README.md
+  assets/portfolio/     Hero carousel images — drop files in, see its README
 ```
+
+Carousel images are picked up automatically from `src/assets/portfolio/`, so
+adding a photo means adding a file — no code change.

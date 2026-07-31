@@ -193,3 +193,17 @@
 @utility animate-fade-up {
   animation: fade-up 0.7s ease-out both;
 }
+
+/* The marquee track holds the items twice over, so translating it exactly
+   half its width lands on an identical frame and the loop is seamless. */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@utility animate-marquee {
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}

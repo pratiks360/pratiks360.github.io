@@ -1,117 +1,92 @@
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Fragment, useState } from "react";
 
 interface ImageCarouselProps {
+  /** Overrides auto-discovery. Normally you want to just drop files in the folder. */
   images?: string[];
 }
 
-export default function ImageCarousel({ images = [] }: ImageCarouselProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlay, setIsAutoPlay] = useState(true);
+// Every image in src/assets/portfolio/ is picked up automatically and ordered by
+// filename, so adding a photo is a matter of dropping the file in — no code
+// change. Vite hashes and rewrites these URLs at build time.
+const discovered = Object.entries(
+  import.meta.glob<string>("../../assets/portfolio/*.{jpg,jpeg,png,webp,avif}", {
+    eager: true,
+    query: "?url",
+    import: "default",
+  }),
+)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([, url]) => url);
 
-  // Default placeholder images if none provided
-  const displayImages = images.length > 0 ? images : [
-    "/images/placeholder-1.jpg",
-    "/images/placeholder-2.jpg",
-    "/images/placeholder-3.jpg",
-  ];
+// Roughly how long one image takes to cross the strip. Total duration scales
+// with the item count so the speed stays constant however many are added.
+const SECONDS_PER_IMAGE = 6;
 
-  useEffect(() => {
-    if (!isAutoPlay) return;
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % displayImages.length);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [isAutoPlay, displayImages.length]);
+export default function ImageCarousel({ images }: ImageCarouselProps) {
+  const [broken, setBroken] = useState<string[]>([]);
+  const source = images ?? discovered;
+  const visible = source.filter((src) => !broken.includes(src));
 
-  const next = () => {
-    setCurrentIndex((prev) => (prev + 1) % displayImages.length);
-    setIsAutoPlay(false);
-  };
+  if (visible.length === 0) {
+    // A build-time hint is useful while developing but has no business on a
+    // live portfolio, so in production the hero simply renders without a strip.
+    if (!import.meta.env.DEV) return null;
 
-  const prev = () => {
-    setCurrentIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length);
-    setIsAutoPlay(false);
-  };
+    return (
+      <div className="w-full max-w-sm rounded-lg border border-dashed border-primary/40 bg-card/30 p-8 text-center">
+        <div className="font-mono text-xs text-muted-foreground">
+          <span className="text-primary">$</span> ls src/assets/portfolio/
+        </div>
+        <p className="mt-3 font-mono text-xs leading-relaxed text-muted-foreground">
+          no images yet — drop files into{" "}
+          <span className="text-foreground">src/assets/portfolio/</span> and they
+          appear here automatically
+        </p>
+      </div>
+    );
+  }
+
+  // The track carries the list twice so the -50% translate loops seamlessly.
+  const track = [...visible, ...visible];
 
   return (
-    <div className="relative w-full max-w-sm mx-auto group">
-      {/* Main carousel container */}
-      <div className="relative overflow-hidden rounded-lg border border-primary/40 bg-card/30 backdrop-blur-sm">
-        {/* Image wrapper */}
-        <div className="relative aspect-square md:aspect-[4/5] bg-gradient-to-br from-primary/10 to-transparent">
-          {displayImages.length > 0 ? (
-            <img
-              src={displayImages[currentIndex]}
-              alt={`Portfolio ${currentIndex + 1}`}
-              className="w-full h-full object-cover transition-opacity duration-500"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground font-mono text-sm">
-              <span>./images not loaded</span>
-            </div>
-          )}
-
-          {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-
-          {/* Image counter */}
-          <div className="absolute top-4 right-4 bg-primary/80 text-primary-foreground px-3 py-1 rounded font-mono text-xs">
-            {currentIndex + 1} / {displayImages.length}
-          </div>
-        </div>
-
-        {/* Navigation buttons */}
-        {displayImages.length > 1 && (
-          <>
-            <button
-              onClick={prev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-primary/80 hover:bg-primary text-primary-foreground p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 md:opacity-70 md:hover:opacity-100"
-              aria-label="Previous image"
+    <div
+      className="group relative w-full overflow-hidden"
+      style={
+        {
+          "--marquee-duration": `${visible.length * SECONDS_PER_IMAGE * 2}s`,
+        } as React.CSSProperties
+      }
+    >
+      <div className="flex w-max items-center animate-marquee group-hover:[animation-play-state:paused]">
+        {track.map((src, i) => (
+          <Fragment key={`${src}-${i}`}>
+            <figure className="w-36 shrink-0 sm:w-44">
+              <img
+                src={src}
+                alt=""
+                loading="lazy"
+                onError={() =>
+                  setBroken((prev) =>
+                    prev.includes(src) ? prev : [...prev, src],
+                  )
+                }
+                className="aspect-[4/5] w-full rounded-lg border border-primary/40 object-cover"
+              />
+            </figure>
+            <span
+              aria-hidden="true"
+              className="shrink-0 px-4 font-mono text-2xl text-primary/70 sm:px-6"
             >
-              <ChevronLeft size={20} />
-            </button>
-            <button
-              onClick={next}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-primary/80 hover:bg-primary text-primary-foreground p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 md:opacity-70 md:hover:opacity-100"
-              aria-label="Next image"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </>
-        )}
+              /
+            </span>
+          </Fragment>
+        ))}
       </div>
 
-      {/* Dot indicators */}
-      {displayImages.length > 1 && (
-        <div className="flex justify-center gap-2 mt-4">
-          {displayImages.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                setCurrentIndex(index);
-                setIsAutoPlay(false);
-              }}
-              className={`transition-all rounded-full ${
-                index === currentIndex
-                  ? "bg-primary w-2 h-2"
-                  : "bg-muted-foreground/50 hover:bg-muted-foreground w-1.5 h-1.5"
-              }`}
-              aria-label={`Go to image ${index + 1}`}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Autoplay indicator */}
-      <div className="mt-3 text-center">
-        <button
-          onClick={() => setIsAutoPlay(!isAutoPlay)}
-          className="text-xs font-mono text-muted-foreground hover:text-primary transition-colors"
-        >
-          {isAutoPlay ? "● autoplay" : "○ paused"}
-        </button>
-      </div>
+      {/* Soften both ends so items enter and leave rather than popping. */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-background to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent" />
     </div>
   );
 }
