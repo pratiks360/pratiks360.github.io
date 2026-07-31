@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Section from "./Section";
+import VisitCounter from "./VisitCounter";
 
 const socials = [
   { label: "email", href: "mailto:pratiks360@gmail.com", value: "pratiks360@gmail.com" },
@@ -12,15 +13,6 @@ export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [visitCount, setVisitCount] = useState(0);
-
-  useEffect(() => {
-    // Initialize visit counter
-    const count = localStorage.getItem("portfolio_visits");
-    const newCount = (parseInt(count || "0", 10) + 1);
-    localStorage.setItem("portfolio_visits", newCount.toString());
-    setVisitCount(newCount);
-  }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,10 +147,7 @@ export default function Contact() {
               <span className="text-primary">●</span> system.status ={" "}
               <span className="text-foreground">operational</span>
             </div>
-            <div>
-              <span className="text-primary">●</span> visitors ={" "}
-              <span className="text-foreground">{visitCount.toLocaleString()}</span>
-            </div>
+            <VisitCounter />
           </div>
         </div>
       </footer>
