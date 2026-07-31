@@ -1,0 +1,20 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "portfolio-dev",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "dev"],
+      "port": 8080
+    },
+    {
+      "name": "pages-static-preview",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "run",
+        "C:/Users/10101137/AppData/Local/Temp/claude/C--PROJECTS-self-terminal-craftsman-folio/141e0671-aee3-4d0d-8740-b5696001958e/scratchpad/static-serve.ts"
+      ],
+      "port": 4321
+    }
+  ]
+}

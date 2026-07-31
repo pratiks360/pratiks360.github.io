@@ -91,6 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "12+ years architecting AI, banking, cloud, and event-streaming platforms for global enterprises. Based in Dubai, UAE.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://pratiks360.github.io" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [

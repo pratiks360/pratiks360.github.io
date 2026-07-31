@@ -6,10 +6,22 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+// GitHub Pages serves static files only — no SSR runtime. `bun run build:pages` sets
+// PAGES_BUILD=1, which prerenders every route to HTML and skips nitro entirely.
+// Unset (the default Lovable/Cloudflare build) leaves behaviour untouched.
+const isPagesBuild = process.env.PAGES_BUILD === "1";
+
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    ...(isPagesBuild
+      ? {
+          prerender: { enabled: true, crawlLinks: true, failOnError: true },
+          pages: [{ path: "/" }, { path: "/sitemap.xml" }],
+        }
+      : {}),
   },
+  ...(isPagesBuild ? { nitro: false as const } : {}),
 });
