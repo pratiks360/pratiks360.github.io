@@ -1,12 +1,12 @@
 import Section from "./Section";
 
-const traits = [
-  "Raspberry Pi tinkerer",
-  "Home Assistant addict",
-  "Linux enthusiast",
-  "Astronomy lover",
-  "DIY automation",
-  "Open-source contributor",
+// The interests that used to live here now have room of their own in the
+// "beyond work" section — see src/content/beyond-work.ts.
+const facts = [
+  { label: "based", value: "Dubai, UAE" },
+  { label: "experience", value: "12+ years" },
+  { label: "focus", value: "AI · cloud · event streaming" },
+  { label: "domains", value: "banking · payments · enterprise" },
 ];
 
 export default function About() {
@@ -32,16 +32,16 @@ export default function About() {
         </div>
         <aside className="rounded-lg border border-border/70 bg-card/60 p-6">
           <div className="mb-4 font-mono text-xs text-muted-foreground">
-            <span className="text-primary">$</span> cat ~/.personality
+            <span className="text-primary">$</span> cat ~/.profile
           </div>
-          <ul className="space-y-2 font-mono text-sm">
-            {traits.map((t) => (
-              <li key={t} className="flex items-start gap-2">
-                <span className="text-primary">›</span>
-                <span className="text-foreground/85">{t}</span>
-              </li>
+          <dl className="space-y-3 font-mono text-sm">
+            {facts.map((f) => (
+              <div key={f.label}>
+                <dt className="text-xs text-primary/70">{f.label}</dt>
+                <dd className="mt-0.5 text-foreground/85">{f.value}</dd>
+              </div>
             ))}
-          </ul>
+          </dl>
         </aside>
       </div>
     </Section>

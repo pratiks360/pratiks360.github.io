@@ -9,6 +9,7 @@ import Accomplishments from "@/components/portfolio/Accomplishments";
 import Certifications from "@/components/portfolio/Certifications";
 import Projects from "@/components/portfolio/Projects";
 import Education from "@/components/portfolio/Education";
+import BeyondWork from "@/components/portfolio/BeyondWork";
 import Contact from "@/components/portfolio/Contact";
 
 export const Route = createFileRoute("/")({
@@ -106,6 +107,7 @@ function Index() {
         <Certifications />
         <Projects />
         <Education />
+        <BeyondWork />
         <Contact />
       </main>
     </div>

@@ -1,4 +1,5 @@
 import { Fragment, useState } from "react";
+import { captions } from "@/content/beyond-work";
 
 interface ImageCarouselProps {
   /** Overrides auto-discovery. Normally you want to just drop files in the folder. */
@@ -7,7 +8,8 @@ interface ImageCarouselProps {
 
 // Every image in src/assets/portfolio/ is picked up automatically and ordered by
 // filename, so adding a photo is a matter of dropping the file in — no code
-// change. Vite hashes and rewrites these URLs at build time.
+// change. Vite hashes and rewrites these URLs at build time, so the original
+// filename is kept alongside to look captions up by.
 const discovered = Object.entries(
   import.meta.glob<string>("../../assets/portfolio/*.{jpg,jpeg,png,webp,avif}", {
     eager: true,
@@ -16,7 +18,7 @@ const discovered = Object.entries(
   }),
 )
   .sort(([a], [b]) => a.localeCompare(b))
-  .map(([, url]) => url);
+  .map(([path, url]) => ({ url, name: path.split("/").pop() ?? "" }));
 
 // Roughly how long one image takes to cross the strip. Total duration scales
 // with the item count so the speed stays constant however many are added.
@@ -24,8 +26,10 @@ const SECONDS_PER_IMAGE = 6;
 
 export default function ImageCarousel({ images }: ImageCarouselProps) {
   const [broken, setBroken] = useState<string[]>([]);
-  const source = images ?? discovered;
-  const visible = source.filter((src) => !broken.includes(src));
+  const source = images
+    ? images.map((url) => ({ url, name: url.split("/").pop() ?? "" }))
+    : discovered;
+  const visible = source.filter((item) => !broken.includes(item.url));
 
   if (visible.length === 0) {
     // A build-time hint is useful while developing but has no business on a
@@ -59,20 +63,25 @@ export default function ImageCarousel({ images }: ImageCarouselProps) {
       }
     >
       <div className="flex w-max items-center animate-marquee group-hover:[animation-play-state:paused]">
-        {track.map((src, i) => (
-          <Fragment key={`${src}-${i}`}>
+        {track.map((item, i) => (
+          <Fragment key={`${item.url}-${i}`}>
             <figure className="w-36 shrink-0 sm:w-44">
               <img
-                src={src}
-                alt=""
+                src={item.url}
+                alt={captions[item.name] ?? ""}
                 loading="lazy"
                 onError={() =>
                   setBroken((prev) =>
-                    prev.includes(src) ? prev : [...prev, src],
+                    prev.includes(item.url) ? prev : [...prev, item.url],
                   )
                 }
                 className="aspect-[4/5] w-full rounded-lg border border-primary/40 object-cover"
               />
+              {captions[item.name] && (
+                <figcaption className="mt-2 font-mono text-[11px] leading-snug text-muted-foreground">
+                  {captions[item.name]}
+                </figcaption>
+              )}
             </figure>
             <span
               aria-hidden="true"
