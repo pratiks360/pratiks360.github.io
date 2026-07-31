@@ -28,9 +28,14 @@ export default function Contact() {
     setStatus("idle");
 
     try {
-      const response = await fetch("/api/contact", {
+      // Posted straight from the browser: GitHub Pages is static, so there is no
+      // server route to proxy through. The Formspree form id is public by design.
+      const response = await fetch("https://formspree.io/f/mzdnqjge", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
         body: JSON.stringify(form),
       });
 
